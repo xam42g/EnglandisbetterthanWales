@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>England Quiz Leaderboard</title>
+  <style>
+    :root {
+      --gold:#ffcc4d;
+      --gold2:#ff9f1c;
+      --blue:#10296d;
+      --dark:#02050d;
+      --panel:#0b1f55;
+      --text:#f5f7ff;
+      --muted:#b8c3ea;
+      --green:#1db954;
+    }
+
+    * {
+      box-sizing:border-box;
+    }
+
+    body {
+      margin:0;
+      min-height:100vh;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(255,204,77,.16), transparent 24%),
+        radial-gradient(circle at center, #10296d 0%, #081a48 34%, #02050d 100%);
+      overflow-x:hidden;
+    }
+
+    .page {
+      max-width:1100px;
+      margin:0 auto;
+      padding:36px 20px;
+    }
+
+    .header {
+      text-align:center;
+      margin-bottom:28px;
+    }
+
+    .header h1 {
+      margin:0;
+      font-size:clamp(34px, 6vw, 70px);
+      letter-spacing:.5px;
+      text-shadow:0 0 24px rgba(255,204,77,.25);
+    }
+
+    .header p {
+      margin:10px 0 0;
+      color:var(--muted);
+      font-size:20px;
+      font-weight:700;
+    }
+
+    .stats {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:14px;
+      margin:26px 0;
+    }
+
+    .stat {
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:20px;
+      padding:18px;
+      text-align:center;
+      box-shadow:0 12px 30px rgba(0,0,0,.22);
+    }
+
+    .stat span {
+      display:block;
+      color:var(--muted);
+      font-weight:800;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin-bottom:8px;
+    }
+
+    .stat strong {
+      font-size:32px;
+      color:var(--gold);
+    }
+
+    .board {
+      background:linear-gradient(180deg, rgba(18,49,124,.94), rgba(6,16,42,.96));
+      border:2px solid rgba(255,204,77,.38);
+      border-radius:28px;
+      padding:20px;
+      box-shadow:0 22px 60px rgba(0,0,0,.38), inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    .row {
+      display:grid;
+      grid-template-columns:90px 1fr 170px 210px;
+      gap:14px;
+      align-items:center;
+      padding:16px 18px;
+      margin-bottom:12px;
+      border-radius:20px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .row:last-child {
+      margin-bottom:0;
+    }
+
+    .row.head {
+      background:rgba(255,204,77,.16);
+      color:var(--gold);
+      font-size:15px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+
+    .rank {
+      text-align:center;
+      font-size:28px;
+      color:var(--gold);
+    }
+
+    .name {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .score {
+      text-align:right;
+      color:#fff;
+    }
+
+    .time {
+      text-align:right;
+      color:var(--muted);
+      font-size:15px;
+      font-weight:700;
+    }
+
+    .top1 {
+      background:linear-gradient(180deg, #ffbf00, #e88d00);
+      color:#061126;
+      border-color:#fff0bf;
+      transform:scale(1.01);
+    }
+
+    .top1 .rank,
+    .top1 .score,
+    .top1 .time {
+      color:#061126;
+    }
+
+    .top2 {
+      background:linear-gradient(180deg, rgba(198,210,230,.28), rgba(130,150,190,.22));
+    }
+
+    .top3 {
+      background:linear-gradient(180deg, rgba(205,127,50,.32), rgba(130,70,30,.20));
+    }
+
+    .empty {
+      text-align:center;
+      padding:50px 20px;
+      color:var(--muted);
+      font-size:24px;
+      font-weight:800;
+    }
+
+    .footer {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-top:16px;
+      color:var(--muted);
+      font-weight:700;
+      flex-wrap:wrap;
+    }
+
+    .live {
+      color:var(--green);
+      font-weight:900;
+    }
+
+    .error {
+      margin-top:18px;
+      color:#ffd166;
+      text-align:center;
+      font-weight:800;
+    }
+
+    @media (max-width:800px) {
+      .stats {
+        grid-template-columns:1fr;
+      }
+
+      .row {
+        grid-template-columns:60px 1fr 120px;
+      }
+
+      .time {
+        display:none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="header">
+      <h1>🏆 England Quiz Leaderboard</h1>
+      <p>Live ranking for the class</p>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <span>Players</span>
+        <strong id="playerCount">0</strong>
+      </div>
+      <div class="stat">
+        <span>Best Score</span>
+        <strong id="bestScore">0 €</strong>
+      </div>
+      <div class="stat">
+        <span>Millionaires</span>
+        <strong id="millionaires">0</strong>
+      </div>
+    </section>
+
+    <section class="board">
+      <div class="row head">
+        <div>Rank</div>
+        <div>Name</div>
+        <div style="text-align:right;">Score</div>
+        <div style="text-align:right;">Time</div>
+      </div>
+      <div id="leaderboardRows">
+        <div class="empty">Loading scores...</div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div><span class="live">● LIVE</span> refreshes automatically every 5 seconds</div>
+      <div id="lastUpdate">Last update: --</div>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://sddlfcibzeehruzhbrqx.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_Vwa85CK6aYkQaZt6Bn8aBQ_hjRein_O";
+    const TABLE = "leaderboard";
+
+    function formatMoney(value) {
+      return Number(value || 0).toLocaleString("de-DE") + " €";
+    }
+
+    function formatTime(value) {
+      if(!value) return "";
+      const date = new Date(value);
+      return date.toLocaleTimeString("de-DE", {
+        hour:"2-digit",
+        minute:"2-digit"
+      });
+    }
+
+    async function loadLeaderboard() {
+      const errorBox = document.getElementById("errorBox");
+      errorBox.textContent = "";
+
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=name,score,created_at&order=score.desc&order=created_at.asc&limit=50`;
+
+        const response = await fetch(url, {
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+
+        if(!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        const data = await response.json();
+        renderLeaderboard(data);
+      } catch(error) {
+        console.error(error);
+        errorBox.textContent = "Could not load leaderboard. Check the SELECT policy in Supabase.";
+      }
+    }
+
+    function renderLeaderboard(data) {
+      const rows = document.getElementById("leaderboardRows");
+      const playerCount = document.getElementById("playerCount");
+      const bestScore = document.getElementById("bestScore");
+      const millionaires = document.getElementById("millionaires");
+      const lastUpdate = document.getElementById("lastUpdate");
+
+      playerCount.textContent = data.length;
+      bestScore.textContent = data.length ? formatMoney(data[0].score) : "0 €";
+      millionaires.textContent = data.filter(row => Number(row.score) >= 1000000).length;
+      lastUpdate.textContent = "Last update: " + new Date().toLocaleTimeString("de-DE", {
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
+      });
+
+      if(data.length === 0) {
+        rows.innerHTML = `<div class="empty">No scores yet.</div>`;
+        return;
+      }
+
+      rows.innerHTML = data.map((row, index) => {
+        const rank = index + 1;
+        const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank + ".";
+        const cls = rank === 1 ? "top1" : rank === 2 ? "top2" : rank === 3 ? "top3" : "";
+
+        return `
+          <div class="row ${cls}">
+            <div class="rank">${medal}</div>
+            <div class="name">${escapeHtml(row.name || "Unknown")}</div>
+            <div class="score">${formatMoney(row.score)}</div>
+            <div class="time">${formatTime(row.created_at)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    loadLeaderboard();
+    setInterval(loadLeaderboard, 5000);
+  </script>
+</body>
+</html>
